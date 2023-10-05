@@ -29,11 +29,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+   bool _loading = true;
   @override
   Widget build(BuildContext context) {
     final ImagePicker picker = ImagePicker();
     FilePickerResult? filePickerResult;
     File? image;
+   
 
     chooseImage() async {
       if (Platform.isIOS || Platform.isAndroid) {
@@ -72,11 +74,10 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
-          
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(
-              height: 50,
+              height: 85,
             ),
             const Text(
               'CNN Project',
@@ -96,26 +97,77 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(
               height: 40,
             ),
-            image != null
-                ? Image.file(image!)
-                : const Icon(
-                    Icons.image,
-                    size: 150,
+            Center(
+              child: _loading
+                  ? SizedBox(
+                      width: 280,
+                      child: Column(children: [
+                        Image.asset('assets/cat.png'),
+                        const SizedBox(
+                          height: 50,
+                        ),
+                      ]),
+                    )
+                  : SizedBox(),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Column(children: [
+                GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 150,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 17,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE99600),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text('Take a photo', style: TextStyle(color: Colors.white),),
                   ),
-            ElevatedButton(
-              onPressed: () {
-                chooseImage();
-              },
-              child: const Text('Gallary'),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  captureImage();
-                },
-                child: const Text('Camera'))
+                ),
+                const SizedBox(height: 20,),
+                GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 150,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 17,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE99600),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text('Camera roll', style: TextStyle(color: Colors.white),),
+                  ),
+                ),
+              ]),
+            )
+            // image != null
+            //     ? Image.file(image!)
+            //     : const Icon(
+            //         Icons.image,
+            //         size: 150,
+            //       ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     chooseImage();
+            //   },
+            //   child: const Text('Gallary'),
+            // ),
+            // const SizedBox(
+            //   height: 10,
+            // ),
+            // ElevatedButton(
+            //     onPressed: () {
+            //       captureImage();
+            //     },
+            //     child: const Text('Camera'))
           ],
         ),
       ),
