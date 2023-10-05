@@ -13,14 +13,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Cat vs Dog Predictor',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(),
+      title: 'Cat vs Dog',
+      home: MyHomePage(),
     );
   }
 }
@@ -72,13 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0XFF101010),
-      ),
+      backgroundColor: const Color(0XFF101010),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(
               height: 50,
@@ -97,6 +92,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontSize: 28,
                 fontWeight: FontWeight.w600,
               ),
+            ),
+            const SizedBox(
+              height: 40,
             ),
             image != null
                 ? Image.file(image!)
