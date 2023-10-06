@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tflite/tflite.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,46 +30,78 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-   bool _loading = true;
   @override
-  Widget build(BuildContext context) {
-    final ImagePicker picker = ImagePicker();
-    FilePickerResult? filePickerResult;
-    File? image;
-   
+  void initState() {
+    super.initState();
+    loadModel().then((value) {
+      setState(() {});
+    });
+  }
 
-    chooseImage() async {
-      if (Platform.isIOS || Platform.isAndroid) {
-        final XFile? file = await picker.pickImage(source: ImageSource.gallery);
-        if (file != null) {
-          setState(() {
-            image = File(file.path);
-          });
-        }
-      } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        // Use file_picker on web and desktop
-        filePickerResult = await FilePicker.platform.pickFiles(
-          type: FileType.image,
-          allowMultiple: false,
-        );
+  bool _loading = true;
+  final ImagePicker picker = ImagePicker();
+  FilePickerResult? filePickerResult;
+  File? image;
+  List? output;
 
-        if (filePickerResult != null) {
-          setState(() {
-            image = File(filePickerResult!.files.single.path!);
-          });
-        }
-      }
-    }
-
-    captureImage() async {
-      final XFile? file = await picker.pickImage(source: ImageSource.camera);
+  chooseImage() async {
+    if (Platform.isIOS || Platform.isAndroid) {
+      final XFile? file = await picker.pickImage(source: ImageSource.gallery);
       if (file != null) {
         setState(() {
           image = File(file.path);
         });
       }
+    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      filePickerResult = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+      );
+      if (filePickerResult != null) {
+        setState(() {
+          image = File(filePickerResult!.files.single.path!);
+        });
+      }
     }
+    classifyImage(image!);
+  }
 
+  captureImage() async {
+    final XFile? file = await picker.pickImage(source: ImageSource.camera);
+    if (file != null) {
+      setState(() {
+        image = File(file.path);
+      });
+    }
+    classifyImage(image!);
+  }
+
+  classifyImage(File img) async {
+    var output = await Tflite.runModelOnImage(
+        path: img.path,
+        numResults: 2,
+        threshold: 0.5,
+        imageMean: 127.5,
+        imageStd: 127.5);
+    setState(() {
+      output = output;
+      _loading = false;
+    });
+  }
+
+  loadModel() async {
+    await Tflite.loadModel(
+        model: 'assets/model_unquant.tflite', labels: 'assets/labels.txt');
+  }
+
+  @override
+  void dispose() {
+    Tflite.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0XFF101010),
       body: Container(
@@ -108,13 +141,35 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ]),
                     )
-                  : SizedBox(),
+                  : SizedBox(
+                      child: Column(children: [
+                        Container(
+                          height: 250,
+                          child: Image.file(image!),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        output != null
+                            ? Text(
+                                '${output![0]['label']}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
+                              )
+                            : Container(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ]),
+                    ),
             ),
             SizedBox(
               width: MediaQuery.of(context).size.width,
               child: Column(children: [
                 GestureDetector(
-                  onTap: () {},
+                  onTap: captureImage,
                   child: Container(
                     width: MediaQuery.of(context).size.width - 150,
                     alignment: Alignment.center,
@@ -126,12 +181,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: const Color(0xFFE99600),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text('Take a photo', style: TextStyle(color: Colors.white),),
+                    child: const Text(
+                      'Take a photo',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(
+                  height: 20,
+                ),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: chooseImage,
                   child: Container(
                     width: MediaQuery.of(context).size.width - 150,
                     alignment: Alignment.center,
@@ -143,7 +203,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: const Color(0xFFE99600),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text('Camera roll', style: TextStyle(color: Colors.white),),
+                    child: const Text(
+                      'Camera roll',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ]),
