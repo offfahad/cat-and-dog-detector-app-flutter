@@ -1,16 +1,6 @@
-# cat_vs_dog_predictor
+# Cat and Dog Detector App Flutter
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This application used the tensorflow lite model kit to detect the dogs and cats. 
+CNN classification model kit is made by using Teachable Machaine Website.
+User can select pcitures from gallary or camera then the predicted label of the model will be shown to user.
+Tflite package is used to load the model in flutter.
