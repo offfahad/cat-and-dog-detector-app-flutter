@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tflite/tflite.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,7 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
         image = File(file.path);
       });
     }
-    classifyImage(image!);
+    if (image != null) {
+      classifyImage(image!);
+    }
   }
 
   captureImage() async {
@@ -58,18 +61,21 @@ class _MyHomePageState extends State<MyHomePage> {
         image = File(file.path);
       });
     }
-    classifyImage(image!);
+    if (image != null) {
+      classifyImage(image!);
+    }
   }
 
   classifyImage(File img) async {
-    var output = await Tflite.runModelOnImage(
+    var result = await Tflite.runModelOnImage(
         path: img.path,
         numResults: 2,
         threshold: 0.5,
         imageMean: 127.5,
         imageStd: 127.5);
     setState(() {
-      output = output;
+      output = result;
+      print(output);
       _loading = false;
     });
   }
@@ -113,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             const SizedBox(
-              height: 40,
+              height: 100,
             ),
             Center(
               child: _loading
@@ -128,12 +134,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   : SizedBox(
                       child: Column(children: [
-                        Container(
+                        SizedBox(
                           height: 250,
                           child: Image.file(image!),
                         ),
                         const SizedBox(
-                          height: 20,
+                          height: 50,
                         ),
                         output != null
                             ? Text(
@@ -145,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               )
                             : Container(),
                         const SizedBox(
-                          height: 10,
+                          height: 50,
                         ),
                       ]),
                     ),
@@ -196,26 +202,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ]),
             )
-            // image != null
-            //     ? Image.file(image!)
-            //     : const Icon(
-            //         Icons.image,
-            //         size: 150,
-            //       ),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     chooseImage();
-            //   },
-            //   child: const Text('Gallary'),
-            // ),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-            // ElevatedButton(
-            //     onPressed: () {
-            //       captureImage();
-            //     },
-            //     child: const Text('Camera'))
           ],
         ),
       ),
