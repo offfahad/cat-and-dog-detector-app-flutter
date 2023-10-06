@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tflite/tflite.dart';
@@ -40,28 +38,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _loading = true;
   final ImagePicker picker = ImagePicker();
-  FilePickerResult? filePickerResult;
   File? image;
   List? output;
 
   chooseImage() async {
-    if (Platform.isIOS || Platform.isAndroid) {
-      final XFile? file = await picker.pickImage(source: ImageSource.gallery);
-      if (file != null) {
-        setState(() {
-          image = File(file.path);
-        });
-      }
-    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      filePickerResult = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: false,
-      );
-      if (filePickerResult != null) {
-        setState(() {
-          image = File(filePickerResult!.files.single.path!);
-        });
-      }
+    final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      setState(() {
+        image = File(file.path);
+      });
     }
     classifyImage(image!);
   }
